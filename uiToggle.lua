@@ -1,90 +1,194 @@
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+--[[
+    ZicyeHub — UI Toggle (Orion Library)
+    Author: REDZ
+]]
 
-local gui = Instance.new("ScreenGui")
-gui.Name = "ZicyeHub"
-gui.ResetOnSpawn = false
-gui.Parent = PlayerGui
+--// BOOT ORION
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/jensonhirst/Orion/main/source.lua"))()
 
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 260, 0, 440)
-frame.Position = UDim2.new(0, 20, 0, 100)
-frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-frame.BorderSizePixel = 0
-frame.Active = true
-frame.Draggable = true
-frame.Parent = gui
+--// WINDOW
+local Window = OrionLib:MakeWindow({
+    Name = "ZicyeHub v1.0.0",
+    HidePremium = false,
+    SaveConfig = true,
+    ConfigFolder = "ZicyeHub",
+    IntroEnabled = true,
+    IntroText = "ZicyeHub Loading...",
+    IntroIcon = "rbxassetid://4483345998",
+    Icon = "rbxassetid://4483345998",
+    CloseCallback = function()
+        print("[ZicyeHub] Window closed.")
+    end
+})
 
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 40)
-title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-title.Text = "ZicyeHub v1.0.0"
-title.TextColor3 = Color3.fromRGB(255, 80, 80)
-title.Font = Enum.Font.GothamBold
-title.TextSize = 18
-title.Parent = frame
+--// TABS
+local EggTab = Window:MakeTab({
+    Name = "Egg",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
 
-local close = Instance.new("TextButton")
-close.Size = UDim2.new(0, 40, 0, 40)
-close.Position = UDim2.new(1, -40, 0, 0)
-close.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-close.Text = "X"
-close.TextColor3 = Color3.fromRGB(255, 255, 255)
-close.Font = Enum.Font.GothamBold
-close.TextSize = 18
-close.Parent = title
-close.MouseButton1Click:Connect(function() gui:Destroy() end)
+local AntiAfkTab = Window:MakeTab({
+    Name = "Anti-AFK",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
 
-local list = {
-    "Anti-AFK",
-    "Auto Collect Egg",
-    "Auto Steal Egg",
-    "Auto Hatch Egg",
-    "Auto Place Best Pet",
-    "Auto Upgrade Plot",
-    "Auto Hunt Drones"
-}
+--// SECTION: EGG
+local EggSection = EggTab:AddSection({ Name = "Egg Automation" })
 
-local y = 50
-for _, name in ipairs(list) do
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, -20, 0, 40)
-    btn.Position = UDim2.new(0, 10, 0, y)
-    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    btn.BorderSizePixel = 0
-    btn.Text = name
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.Font = Enum.Font.Gotham
-    btn.TextSize = 14
-    btn.TextXAlignment = Enum.TextXAlignment.Left
-    btn.Parent = frame
+EggTab:AddToggle({
+    Name = "Auto Collect Egg",
+    Default = false,
+    Save = true,
+    Flag = "autoCollectEgg",
+    Callback = function(v)
+        _G.ZicyeHub_AutoCollectEgg = v
+        print("[ZicyeHub] Auto Collect Egg = " .. tostring(v))
+    end
+})
 
-    local status = Instance.new("TextLabel")
-    status.Size = UDim2.new(0, 60, 1, 0)
-    status.Position = UDim2.new(1, -60, 0, 0)
-    status.BackgroundTransparency = 1
-    status.Text = "OFF"
-    status.TextColor3 = Color3.fromRGB(255, 80, 80)
-    status.Font = Enum.Font.GothamBold
-    status.TextSize = 14
-    status.Parent = btn
+EggTab:AddToggle({
+    Name = "Auto Steal Egg",
+    Default = false,
+    Save = true,
+    Flag = "autoStealEgg",
+    Callback = function(v)
+        _G.ZicyeHub_AutoStealEgg = v
+        print("[ZicyeHub] Auto Steal Egg = " .. tostring(v))
+    end
+})
 
-    local on = false
-    btn.MouseButton1Click:Connect(function()
-        on = not on
-        if on then
-            status.Text = "ON"
-            status.TextColor3 = Color3.fromRGB(0, 255, 0)
-            btn.BackgroundColor3 = Color3.fromRGB(40, 80, 40)
-        else
-            status.Text = "OFF"
-            status.TextColor3 = Color3.fromRGB(255, 80, 80)
-            btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+EggTab:AddToggle({
+    Name = "Auto Hatch Egg",
+    Default = false,
+    Save = true,
+    Flag = "autoHatchEgg",
+    Callback = function(v)
+        _G.ZicyeHub_AutoHatchEgg = v
+        print("[ZicyeHub] Auto Hatch Egg = " .. tostring(v))
+    end
+})
+
+EggTab:AddToggle({
+    Name = "Auto Place Best Pet",
+    Default = false,
+    Save = true,
+    Flag = "autoPlaceBestPet",
+    Callback = function(v)
+        _G.ZicyeHub_AutoPlaceBestPet = v
+        print("[ZicyeHub] Auto Place Best Pet = " .. tostring(v))
+    end
+})
+
+EggTab:AddSlider({
+    Name = "Teleport Speed",
+    Min = 0.05,
+    Max = 1,
+    Default = 0.15,
+    Color = Color3.fromRGB(255, 80, 80),
+    Increment = 0.05,
+    ValueName = "sec",
+    Flag = "teleportSpeed",
+    Callback = function(v)
+        _G.ZicyeHub_TeleportSpeed = v
+        print("[ZicyeHub] Teleport Speed = " .. tostring(v))
+    end
+})
+
+EggTab:AddTextbox({
+    Name = "Egg Keyword",
+    Default = "Egg",
+    TextDisappear = false,
+    Flag = "eggKeyword",
+    Callback = function(v)
+        _G.ZicyeHub_EggKeyword = v
+        print("[ZicyeHub] Egg Keyword = " .. tostring(v))
+    end
+})
+
+EggTab:AddButton({
+    Name = "Force Collect Now",
+    Callback = function()
+        print("[ZicyeHub] Force collect triggered.")
+        if _G.ZicyeHub_ForceCollect then
+            _G.ZicyeHub_ForceCollect()
         end
-    end)
+    end
+})
 
-    y = y + 45
-end
+--// SECTION: ANTI-AFK
+local AntiSection = AntiAfkTab:AddSection({ Name = "Anti-AFK Settings" })
 
-print("[ZicyeHub] UI Toggle loaded.")
+AntiAfkTab:AddToggle({
+    Name = "Anti-AFK Enabled",
+    Default = true,
+    Save = true,
+    Flag = "antiAfkEnabled",
+    Callback = function(v)
+        _G.ZicyeHub_AntiAfk = v
+        print("[ZicyeHub] Anti-AFK = " .. tostring(v))
+    end
+})
+
+AntiAfkTab:AddSlider({
+    Name = "Interval",
+    Min = 10,
+    Max = 300,
+    Default = 60,
+    Color = Color3.fromRGB(255, 80, 80),
+    Increment = 5,
+    ValueName = "sec",
+    Flag = "antiAfkInterval",
+    Callback = function(v)
+        _G.ZicyeHub_AntiAfkInterval = v
+        print("[ZicyeHub] Anti-AFK Interval = " .. tostring(v))
+    end
+})
+
+AntiAfkTab:AddToggle({
+    Name = "Reconnect on Kick",
+    Default = true,
+    Save = true,
+    Flag = "reconnectOnKick",
+    Callback = function(v)
+        _G.ZicyeHub_ReconnectOnKick = v
+        print("[ZicyeHub] Reconnect on Kick = " .. tostring(v))
+    end
+})
+
+AntiAfkTab:AddSlider({
+    Name = "Reconnect Delay",
+    Min = 1,
+    Max = 60,
+    Default = 10,
+    Color = Color3.fromRGB(255, 80, 80),
+    Increment = 1,
+    ValueName = "sec",
+    Flag = "reconnectDelay",
+    Callback = function(v)
+        _G.ZicyeHub_ReconnectDelay = v
+        print("[ZicyeHub] Reconnect Delay = " .. tostring(v))
+    end
+})
+
+--// SECTION: INFO
+local InfoSection = AntiAfkTab:AddSection({ Name = "Info" })
+
+AntiAfkTab:AddParagraph(
+    "ZicyeHub",
+    "Steal An Egg script hub.\nAnti-AFK + Auto Egg + UI Toggle.\n\nAuthor: REDZ"
+)
+
+--// NOTIFIKASI
+OrionLib:MakeNotification({
+    Name = "ZicyeHub",
+    Content = "Script loaded successfully!",
+    Image = "rbxassetid://4483345998",
+    Time = 5
+})
+
+--// INIT (WAJIB DI AKHIR)
+OrionLib:Init()
+
+print("[ZicyeHub] UI Toggle (Orion) loaded.")
